@@ -73,6 +73,7 @@ class SettingId(GoProIntEnum):
     COLOR = 116
     RAW_AUDIO_TRACK = 139
     WIND = 149
+    MODS_MIC = 169
 
     # Internal/hidden settings
     INTERNAL_6 = 6
@@ -143,7 +144,6 @@ class SettingId(GoProIntEnum):
     INTERNAL_165 = 165
     INTERNAL_166 = 166
     INTERNAL_168 = 168
-    INTERNAL_169 = 169
     INTERNAL_174 = 174
     INTERNAL_181 = 181
 
@@ -239,6 +239,14 @@ class Wind(GoProIntEnum):
     OFF = 0
     AUTO = 2
     ON = 4
+
+
+class ModsMic(GoProIntEnum):
+    STANDARD_MIC = 1
+    STANDARD_MIC_PLUS = 2
+    POWERED_MIC = 3
+    POWERED_MIC_PLUS = 4
+    LINE_IN = 5
 
 
 class MediaFormat(GoProIntEnum):

@@ -32,6 +32,7 @@ class HttpSettings(HttpMessages[HttpSetting]):
         self.color: HttpSetting[settings.ColorProfile] = HttpSetting[settings.ColorProfile](communicator, SettingId.COLOR)
         self.raw_audio_track: HttpSetting[settings.RawAudioTrack] = HttpSetting[settings.RawAudioTrack](communicator, SettingId.RAW_AUDIO_TRACK)
         self.wind: HttpSetting[settings.Wind] = HttpSetting[settings.Wind](communicator, SettingId.WIND)
+        self.mods_mic: HttpSetting[settings.ModsMic] = HttpSetting[settings.ModsMic](communicator, SettingId.MODS_MIC)
 
         self.media_format: HttpSetting[settings.MediaFormat] = HttpSetting[settings.MediaFormat](
             communicator, SettingId.MEDIA_FORMAT

@@ -34,6 +34,7 @@ class BleSettings(BleMessages[BleSetting.BleSettingMessageBase]):
         self.color: BleSetting[settings.ColorProfile] = BleSetting[settings.ColorProfile](communicator, SettingId.COLOR, settings.ColorProfile)
         self.raw_audio_track: BleSetting[settings.RawAudioTrack] = BleSetting[settings.RawAudioTrack](communicator, SettingId.RAW_AUDIO_TRACK, settings.RawAudioTrack)
         self.wind: BleSetting[settings.Wind] = BleSetting[settings.Wind](communicator, SettingId.WIND, settings.Wind)
+        self.mods_mic: BleSetting[settings.ModsMic] = BleSetting[settings.ModsMic](communicator, SettingId.MODS_MIC, settings.ModsMic)
 
         self.media_format: BleSetting[settings.MediaFormat] = BleSetting[settings.MediaFormat](
             communicator, SettingId.MEDIA_FORMAT, settings.MediaFormat
