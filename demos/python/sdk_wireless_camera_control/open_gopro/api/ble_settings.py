@@ -25,6 +25,15 @@ class BleSettings(BleMessages[BleSetting.BleSettingMessageBase]):
     """
 
     def __init__(self, communicator: GoProBle):
+        self.iso_min: BleSetting[settings.IsoValue] = BleSetting[settings.IsoValue](communicator, SettingId.ISO_MIN, settings.IsoValue)
+        self.iso_max: BleSetting[settings.IsoValue] = BleSetting[settings.IsoValue](communicator, SettingId.ISO_MAX, settings.IsoValue)
+        self.sharpness: BleSetting[settings.Sharpness] = BleSetting[settings.Sharpness](communicator, SettingId.SHARPNESS, settings.Sharpness)
+        self.ev_comp: BleSetting[settings.EvCompValue] = BleSetting[settings.EvCompValue](communicator, SettingId.EV_COMP, settings.EvCompValue)
+        self.white_balance: BleSetting[settings.WhiteBalance] = BleSetting[settings.WhiteBalance](communicator, SettingId.WHITE_BALANCE, settings.WhiteBalance)
+        self.shutter_speed: BleSetting[settings.ShutterSpeed] = BleSetting[settings.ShutterSpeed](communicator, SettingId.SHUTTER_SPEED, settings.ShutterSpeed)
+        self.color: BleSetting[settings.ColorProfile] = BleSetting[settings.ColorProfile](communicator, SettingId.COLOR, settings.ColorProfile)
+        self.raw_audio_track: BleSetting[settings.RawAudioTrack] = BleSetting[settings.RawAudioTrack](communicator, SettingId.RAW_AUDIO_TRACK, settings.RawAudioTrack)
+        self.wind: BleSetting[settings.Wind] = BleSetting[settings.Wind](communicator, SettingId.WIND, settings.Wind)
 
         self.media_format: BleSetting[settings.MediaFormat] = BleSetting[settings.MediaFormat](
             communicator, SettingId.MEDIA_FORMAT, settings.MediaFormat

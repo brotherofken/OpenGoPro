@@ -1,3 +1,5 @@
+Supports ProTune settings. 
+
 # Open GoPro Python SDK
 
 <img alt="GoPro Logo" src="https://raw.githubusercontent.com/gopro/OpenGoPro/gh-pages/assets/images/logos/logo.png" width="50%" style="max-width: 500px;"/>

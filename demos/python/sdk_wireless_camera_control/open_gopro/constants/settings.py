@@ -63,6 +63,183 @@ class SettingId(GoProIntEnum):
     TIME_LAPSE_DIGITAL_LENSES = 123
     PHOTO_OUTPUT = 125
 
+    # Added manually
+    ISO_MAX = 13
+    ISO_MIN = 102
+    SHARPNESS = 117
+    EV_COMP = 118
+    WHITE_BALANCE = 115
+    SHUTTER_SPEED = 145
+    COLOR = 116
+    RAW_AUDIO_TRACK = 139
+    WIND = 149
+
+    # Internal/hidden settings
+    INTERNAL_6 = 6
+    INTERNAL_19 = 19
+    INTERNAL_24 = 24
+    INTERNAL_30 = 30
+    INTERNAL_31 = 31
+    INTERNAL_32 = 32
+    INTERNAL_37 = 37
+    INTERNAL_41 = 41
+    INTERNAL_42 = 42
+    INTERNAL_43 = 43
+    INTERNAL_44 = 44
+    INTERNAL_45 = 45
+    INTERNAL_47 = 47
+    INTERNAL_48 = 48
+    INTERNAL_54 = 54
+    INTERNAL_60 = 60
+    INTERNAL_61 = 61
+    INTERNAL_62 = 62
+    INTERNAL_64 = 64
+    INTERNAL_65 = 65
+    INTERNAL_66 = 66
+    INTERNAL_67 = 67
+    INTERNAL_68 = 68
+    INTERNAL_69 = 69
+    INTERNAL_75 = 75
+    INTERNAL_76 = 76
+    INTERNAL_79 = 79
+    INTERNAL_83 = 83
+    INTERNAL_84 = 84
+    INTERNAL_85 = 85
+    INTERNAL_86 = 86
+    INTERNAL_87 = 87
+    INTERNAL_88 = 88
+    INTERNAL_96 = 96
+    INTERNAL_103 = 103
+    INTERNAL_104 = 104
+    INTERNAL_105 = 105
+    INTERNAL_106 = 106
+    INTERNAL_111 = 111
+    INTERNAL_112 = 112
+    INTERNAL_114 = 114
+    INTERNAL_124 = 124
+    INTERNAL_125 = 125
+    INTERNAL_126 = 126
+    INTERNAL_129 = 129
+    INTERNAL_130 = 130
+    INTERNAL_131 = 131
+    INTERNAL_132 = 132
+    INTERNAL_133 = 133
+    INTERNAL_142 = 142
+    INTERNAL_144 = 144
+    INTERNAL_146 = 146
+    INTERNAL_147 = 147
+    INTERNAL_148 = 148
+    INTERNAL_153 = 153
+    INTERNAL_154 = 154
+    INTERNAL_155 = 155
+    INTERNAL_156 = 156
+    INTERNAL_157 = 157
+    INTERNAL_158 = 158
+    INTERNAL_159 = 159
+    INTERNAL_160 = 160
+    INTERNAL_161 = 161
+    INTERNAL_163 = 163
+    INTERNAL_164 = 164
+    INTERNAL_165 = 165
+    INTERNAL_166 = 166
+    INTERNAL_168 = 168
+    INTERNAL_169 = 169
+    INTERNAL_174 = 174
+    INTERNAL_181 = 181
+
+    PROTOBUF_SETTING = 0xF3
+
+
+class IsoValue(GoProIntEnum):
+    AUTO = 9
+    NUM_6400 = 0
+    NUM_3200 = 3
+    NUM_1600 = 1
+    NUM_800 = 4
+    NUM_400 = 2
+    NUM_200 = 7
+    NUM_100 = 8
+
+
+class Sharpness(GoProIntEnum):
+    HIGH = 0
+    MEDIUM = 1
+    LOW = 2
+
+
+class EvCompValue(GoProIntEnum):
+    NUM_MINUS_2_0 = 8
+    NUM_MINUS_1_5 = 7
+    NUM_MINUS_1_0 = 6
+    NUM_MINUS_0_5 = 5
+    NUM_0_0 = 4
+    NUM_0_5 = 3
+    NUM_1_0 = 2
+    NUM_1_5 = 1
+    NUM_2_0 = 0
+
+
+class WhiteBalance(GoProIntEnum):
+    NUM_6500K = 3
+    NUM_6000K = 7
+    NUM_5500K = 2
+    NUM_5000K = 12
+    NUM_4500K = 11
+    AUTO = 0
+    NATIVE = 4
+    NUM_4000K = 5
+    NUM_3200K = 10
+    NUM_2800K = 9
+    NUM_2300K = 8
+
+
+class ShutterSpeed(GoProIntEnum):
+    NUM_1_3840 = 31
+    NUM_1_3200 = 30
+    NUM_1_3072 = 34
+    NUM_1_1920 = 24
+    NUM_1_1600 = 29
+    NUM_1_1536 = 33
+    NUM_1_960 = 23
+    NUM_1_800 = 28
+    NUM_1_768 = 32
+    NUM_1_480 = 22
+    NUM_1_400 = 21
+    NUM_1_384 = 25
+    NUM_1_240 = 18
+    NUM_1_200 = 17
+    NUM_1_192 = 16
+    NUM_1_120 = 13
+    NUM_1_100 = 12
+    NUM_1_96 = 11
+    NUM_1_60 = 8
+    NUM_1_50 = 7
+    NUM_1_48 = 6
+    NUM_1_30 = 5
+    NUM_1_25 = 4
+    NUM_1_24 = 3
+    AUTO = 0
+
+
+class ColorProfile(GoProIntEnum):
+    VIBRANT = 100
+    NATURAL = 2
+    FLAT = 1
+    LOG = 3
+
+
+class RawAudioTrack(GoProIntEnum):
+    LOW = 0
+    MEDIUM = 1
+    HIGH = 2
+    OFF = 3
+
+
+class Wind(GoProIntEnum):
+    OFF = 0
+    AUTO = 2
+    ON = 4
+
 
 class MediaFormat(GoProIntEnum):
     """See [Open GoPro Spec](https://gopro.github.io/OpenGoPro/ble/features/settings.html#media-format-128)"""

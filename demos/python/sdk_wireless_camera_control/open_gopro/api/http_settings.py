@@ -23,6 +23,15 @@ class HttpSettings(HttpMessages[HttpSetting]):
     """
 
     def __init__(self, communicator: GoProHttp):
+        self.iso_min: HttpSetting[settings.IsoValue] = HttpSetting[settings.IsoValue](communicator, SettingId.ISO_MIN)
+        self.iso_max: HttpSetting[settings.IsoValue] = HttpSetting[settings.IsoValue](communicator, SettingId.ISO_MAX)
+        self.sharpness: HttpSetting[settings.Sharpness] = HttpSetting[settings.Sharpness](communicator, SettingId.SHARPNESS)
+        self.ev_comp: HttpSetting[settings.EvCompValue] = HttpSetting[settings.EvCompValue](communicator, SettingId.EV_COMP)
+        self.white_balance: HttpSetting[settings.WhiteBalance] = HttpSetting[settings.WhiteBalance](communicator, SettingId.WHITE_BALANCE)
+        self.shutter_speed: HttpSetting[settings.ShutterSpeed] = HttpSetting[settings.ShutterSpeed](communicator, SettingId.SHUTTER_SPEED)
+        self.color: HttpSetting[settings.ColorProfile] = HttpSetting[settings.ColorProfile](communicator, SettingId.COLOR)
+        self.raw_audio_track: HttpSetting[settings.RawAudioTrack] = HttpSetting[settings.RawAudioTrack](communicator, SettingId.RAW_AUDIO_TRACK)
+        self.wind: HttpSetting[settings.Wind] = HttpSetting[settings.Wind](communicator, SettingId.WIND)
 
         self.media_format: HttpSetting[settings.MediaFormat] = HttpSetting[settings.MediaFormat](
             communicator, SettingId.MEDIA_FORMAT
