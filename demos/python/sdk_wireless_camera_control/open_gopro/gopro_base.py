@@ -121,7 +121,7 @@ class GoProBase(GoProHttp, Generic[ApiType]):
     def __init__(self, **kwargs: Any) -> None:
         self._should_maintain_state = kwargs.get("maintain_state", True)
         self._exception_cb = kwargs.get("exception_cb", None)
-        self._pool = concurrent.futures.ThreadPoolExecutor(max_workers=20)
+        self._pool = concurrent.futures.ProcessPoolExecutor(max_workers=20)
 
     async def __aenter__(self: GoPro) -> GoPro:
         await self.open()
