@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import enum
+import functools
 import json
 import logging
 import threading
@@ -380,7 +381,11 @@ class GoProBase(GoProHttp, Generic[ApiType]):
         logger.info(Logger.build_log_tx_str(pretty_print(message._as_dict(**kwargs))))
         for retry in range(1, GoProBase.HTTP_GET_RETRIES + 1):
             try:
-                http_response = requests.get(url, timeout=timeout, **self._build_http_request_args(message))
+                # http_response = requests.get(url, timeout=timeout, **self._build_http_request_args(message))
+                loop = asyncio.get_event_loop()
+                http_response = await loop.run_in_executor(
+                    None, functools.partial(requests.get, url, timeout=timeout, **self._build_http_request_args(message))
+                )
                 logger.trace(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
                 if not http_response.ok:
                     logger.warning(f"Received non-success status {http_response.status_code}: {http_response.reason}")
