@@ -6,9 +6,7 @@
 from __future__ import annotations
 
 import asyncio
-import concurrent.futures
 import enum
-import functools
 import json
 import logging
 import threading
@@ -121,7 +119,6 @@ class GoProBase(GoProHttp, Generic[ApiType]):
     def __init__(self, **kwargs: Any) -> None:
         self._should_maintain_state = kwargs.get("maintain_state", True)
         self._exception_cb = kwargs.get("exception_cb", None)
-        self._pool = concurrent.futures.ProcessPoolExecutor(max_workers=20)
 
     async def __aenter__(self: GoPro) -> GoPro:
         await self.open()
@@ -383,11 +380,7 @@ class GoProBase(GoProHttp, Generic[ApiType]):
         logger.info(Logger.build_log_tx_str(pretty_print(message._as_dict(**kwargs))))
         for retry in range(1, GoProBase.HTTP_GET_RETRIES + 1):
             try:
-                # http_response = requests.get(url, timeout=timeout, **self._build_http_request_args(message))
-                loop = asyncio.get_event_loop()
-                http_response = await loop.run_in_executor(
-                    self._pool, functools.partial(requests.get, url, timeout=timeout, **self._build_http_request_args(message))
-                )
+                http_response = requests.get(url, timeout=timeout, **self._build_http_request_args(message))
                 logger.trace(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
                 if not http_response.ok:
                     logger.warning(f"Received non-success status {http_response.status_code}: {http_response.reason}")
