@@ -6,8 +6,11 @@
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import enum
+import functools
 import json
+import httpx
 import logging
 import threading
 import traceback
@@ -110,11 +113,30 @@ async def enforce_message_rules(wrapped: MessageMethodType, instance: GoProBase,
     return await instance._enforce_message_rules(wrapped, *args, **kwargs)
 
 
+class RequestTimeBenchmarker:
+    def __init__(self) -> None:
+        self.url_to_timings = {}
+
+    def add_measurement(self, url: str, time: float) -> None:
+        if url not in self.url_to_timings:
+            self.url_to_timings[url] = []
+        self.url_to_timings[url].append(time)
+
+    def get_average_time(self, url: str) -> float:
+        if url in self.url_to_timings:
+            return sum(self.url_to_timings[url]) / len(self.url_to_timings[url])
+        return 0.0
+
+    def get_all_average_times(self) -> dict[str, float]:
+        return {url: self.get_average_time(url) for url in self.url_to_timings}
+
+
 class GoProBase(GoProHttp, Generic[ApiType]):
     """The base class for communicating with all GoPro Clients"""
 
     HTTP_TIMEOUT: Final = 5
     HTTP_GET_RETRIES: Final = 5
+    bench = RequestTimeBenchmarker()
 
     def __init__(self, **kwargs: Any) -> None:
         self._should_maintain_state = kwargs.get("maintain_state", True)
@@ -380,16 +402,33 @@ class GoProBase(GoProHttp, Generic[ApiType]):
         logger.info(Logger.build_log_tx_str(pretty_print(message._as_dict(**kwargs))))
         for retry in range(1, GoProBase.HTTP_GET_RETRIES + 1):
             try:
-                http_response = requests.get(url, timeout=timeout, **self._build_http_request_args(message))
-                logger.trace(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
-                if not http_response.ok:
-                    logger.warning(f"Received non-success status {http_response.status_code}: {http_response.reason}")
+                time_before = asyncio.get_event_loop().time()
+                # http_response = requests.get(url, timeout=timeout, **self._build_http_request_args(message))
+                headers = message._headers if message._headers else None
+                verify = str(message._certificate) if message._certificate else None
+                async with httpx.AsyncClient(headers=headers, verify=verify, timeout=timeout) as client:
+                    http_response = await client.get(url)  #, timeout=float(timeout), params=self._build_http_request_args(message))
+                    http_response.ok = http_response.is_success
+                time_after = asyncio.get_event_loop().time()
+                request_time = time_after - time_before
+                self.bench.add_measurement(url, request_time)
+                logger.debug(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
+                if not http_response.is_success:
+                    logger.warning(f"Received non-success status {http_response.status_code}: {http_response.reason_phrase}")
                 response = RequestsHttpRespBuilderDirector(http_response, message._parser)()
                 break
-            except requests.exceptions.ConnectionError as e:
-                # This appears to only occur after initial connection after pairing
+            except httpx.ConnectError as e:
+                logger.warning(f"Connection error: {repr(e)}")
+                logger.warning(repr(e))
+                await asyncio.sleep(2)
+            except httpx.TimeoutException as e:
+                logger.warning(f"Timeout error: {repr(e)}")
                 logger.warning(repr(e))
                 # Back off before retrying. TODO This appears to be needed on MacOS
+                await asyncio.sleep(2)
+            except httpx.RemoteProtocolError as e:
+                logger.warning(f"Remote protocol error: {repr(e)}")
+                logger.warning(repr(e))
                 await asyncio.sleep(2)
             except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.critical(f"Unexpected error: {repr(e)}")
@@ -426,7 +465,7 @@ class GoProBase(GoProHttp, Generic[ApiType]):
         for retry in range(1, GoProBase.HTTP_GET_RETRIES + 1):
             try:
                 http_response = requests.put(url, timeout=timeout, json=body, **self._build_http_request_args(message))
-                logger.trace(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
+                logger.debug(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
                 if not http_response.ok:
                     logger.warning(f"Received non-success status {http_response.status_code}: {http_response.reason}")
                 response = RequestsHttpRespBuilderDirector(http_response, message._parser)()
