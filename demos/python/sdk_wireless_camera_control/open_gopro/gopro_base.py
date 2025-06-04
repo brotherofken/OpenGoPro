@@ -404,9 +404,10 @@ class GoProBase(GoProHttp, Generic[ApiType]):
             try:
                 time_before = asyncio.get_event_loop().time()
                 # http_response = requests.get(url, timeout=timeout, **self._build_http_request_args(message))
-                headers = message._headers if message._headers else None
-                verify = str(message._certificate) if message._certificate else None
-                async with httpx.AsyncClient(headers=headers, verify=verify, timeout=timeout) as client:
+                params = self._build_http_request_args(message)
+                if "timeout" not in params:
+                    params["timeout"] = timeout
+                async with httpx.AsyncClient(**params) as client:
                     http_response = await client.get(url)  #, timeout=float(timeout), params=self._build_http_request_args(message))
                     http_response.ok = http_response.is_success
                 time_after = asyncio.get_event_loop().time()
@@ -445,13 +446,22 @@ class GoProBase(GoProHttp, Generic[ApiType]):
     ) -> GoProResp:
         url = self._base_url + message.build_url(path=kwargs["camera_file"])
         logger.debug(f"Sending:  {url}")
-        with requests.get(url, stream=True, timeout=timeout, **self._build_http_request_args(message)) as request:
-            request.raise_for_status()
-            file = kwargs["local_file"]
-            with open(file, "wb") as f:
-                logger.debug(f"receiving stream to {file}...")
-                for chunk in request.iter_content(chunk_size=8192):
-                    f.write(chunk)
+        params = self._build_http_request_args(message)
+        if "timeout" not in params:
+            params["timeout"] = timeout
+        async with httpx.AsyncClient(*params) as client:
+            async with client.stream(
+                "GET",
+                url,
+                **params
+            ) as response:
+                response.raise_for_status()
+                file = kwargs["local_file"]
+
+                with open(file, "wb") as f:
+                    logger.debug(f"receiving stream to {file}...")
+                    async for chunk in response.aiter_bytes(chunk_size=8192):
+                        f.write(chunk)
 
         return GoProResp(protocol=GoProResp.Protocol.HTTP, status=ErrorCode.SUCCESS, data=file, identifier=url)
 
@@ -464,13 +474,24 @@ class GoProBase(GoProHttp, Generic[ApiType]):
         logger.debug(f"Sending:  {url} with body: {json.dumps(body, indent=4)}")
         for retry in range(1, GoProBase.HTTP_GET_RETRIES + 1):
             try:
-                http_response = requests.put(url, timeout=timeout, json=body, **self._build_http_request_args(message))
-                logger.debug(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
-                if not http_response.ok:
-                    logger.warning(f"Received non-success status {http_response.status_code}: {http_response.reason}")
-                response = RequestsHttpRespBuilderDirector(http_response, message._parser)()
-                break
-            except requests.exceptions.ConnectionError as e:
+                async with httpx.AsyncClient() as client:
+                    params = self._build_http_request_args(message)
+                    if "timeout" not in params:
+                        params["timeout"] = timeout
+                    http_response = await client.put(
+                        url,
+                        json=body,
+                        **params
+                    )
+
+                    logger.debug(f"received raw json: {json.dumps(http_response.json() if http_response.text else {}, indent=4)}")  # type: ignore
+
+                    if not http_response.is_success:
+                        logger.warning(f"Received non-success status {http_response.status_code}: {http_response.reason_phrase}")
+
+                    response = RequestsHttpRespBuilderDirector(http_response, message._parser)()
+                    break
+            except httpx.ConnectError as e:
                 # This appears to only occur after initial connection after pairing
                 logger.warning(repr(e))
                 # Back off before retrying. TODO This appears to be needed on MacOS
